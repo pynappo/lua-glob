@@ -219,6 +219,9 @@ end
 ---@param base? string
 function M:addPattern(pat, base)
     base = base or ''
+    if self.options.asGitIgnore and self.options.root then
+        base = self.options.root / base
+    end
     if self.options.ignoreCase then
         base = base:lower()
     end
@@ -621,18 +624,18 @@ local function createGlob(pattern, options, interface)
         interface = {},
     }, M)
 
+    if type(options) == 'table' then
+        for op, val in pairs(options) do
+            glob:setOption(op, val)
+        end
+    end
+
     if type(pattern) == 'table' then
         for _, pat in ipairs(pattern) do
             glob:addPattern(pat)
         end
     elseif pattern then
         glob:addPattern(pattern)
-    end
-
-    if type(options) == 'table' then
-        for op, val in pairs(options) do
-            glob:setOption(op, val)
-        end
     end
 
     if type(interface) == 'table' then
